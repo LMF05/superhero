@@ -1,7 +1,9 @@
 package com.superhero.sup.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -16,10 +18,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.superhero.sup.dto.SuperheroDTO;
 import com.superhero.sup.entity.SuperheroEntity;
+import com.superhero.sup.exception.SuperheroException;
 import com.superhero.sup.repository.SuperheroRepository;
 import com.superhero.sup.service.impl.SuperheroServiceImpl;
 
@@ -81,5 +85,21 @@ public class SuperheroServiceTest {
 	    }).when(repository).deleteById(Mockito.anyLong());
 		superheroService.deleteSuperhero(Long.valueOf(1));
 		verify(repository, times(1)).deleteById(Long.valueOf(1));
+	}
+	
+	@Test
+	public void getSuperheroExceptionTest() {
+		Mockito.when(repository.findById(Mockito.anyLong())).thenReturn(null);
+		assertThrows(SuperheroException.class, () -> {
+			superheroService.getSuperhero((long) 1);
+		});
+	}
+	
+	@Test
+	public void deleteSuperheroExceptionTest() {
+		doThrow(EmptyResultDataAccessException.class).when(repository).deleteById(Mockito.anyLong());
+		assertThrows(SuperheroException.class, () -> {
+			superheroService.deleteSuperhero(Long.valueOf(1));
+		});
 	}
 }
