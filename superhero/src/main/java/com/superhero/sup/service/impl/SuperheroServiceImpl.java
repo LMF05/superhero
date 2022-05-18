@@ -2,6 +2,7 @@ package com.superhero.sup.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -28,26 +29,54 @@ public class SuperheroServiceImpl implements SuperheroService{
 	
 	@Override
 	public List<SuperheroDTO> getAllSuperheroes(){
+		log.debug("Getting the data from repository");
+		List<SuperheroEntity> superheroesEntity = repository.findAll();
+		log.debug("Data obtained");
 		List<SuperheroDTO> superheroesDTO = new ArrayList<>();
+		log.debug("Mapping superhero to dto");
+		for(SuperheroEntity s: superheroesEntity) {			
+			superheroesDTO.add(superheroMapper.entityToDto(s));
+		}
+		log.debug("Returning the data");
 		return superheroesDTO;
 	}
 	
 	@Override
 	public SuperheroDTO getSuperhero(Long id){
-		SuperheroDTO superheroDTO = new SuperheroDTO();	
+		log.debug("Getting the data from repository");
+		Optional<SuperheroEntity> superheroesEntity = repository.findById(id);
+		log.debug("Data obtained");
+		SuperheroDTO superheroDTO;	
+		log.debug("Mapping superhero to dto");
+		superheroDTO = superheroMapper.entityToDto(superheroesEntity.get());	
+		log.debug("Returning the data");
 		return superheroDTO;
 	}
 	
 	@Override
 	public List<SuperheroDTO> getSuperheroContainingSubstring(String substring){
+		log.debug("Getting the data from repository");
+		List<SuperheroEntity> superheroesEntity = repository.findSuperheroByNameLike(substring);
+		log.debug("Data obtained");
 		List<SuperheroDTO> superheroesDTO = new ArrayList<>();
+		log.debug("Mapping superhero to dto");
+		for(SuperheroEntity s: superheroesEntity) {
+			superheroesDTO.add(superheroMapper.entityToDto(s));
+		}
+		log.debug("Returning the data");
 		return superheroesDTO;
 	}
 	
 	@Override
 	@Transactional
 	public SuperheroDTO modifySuperhero(SuperheroEntity superhero){
-		SuperheroDTO superheroDTO = new SuperheroDTO();	
+		log.debug("Saving the superhero");
+		SuperheroEntity superheroEntity = repository.saveAndFlush(superhero);
+		log.debug("Superhero saved");
+		SuperheroDTO superheroDTO;	
+		log.debug("Mapping superhero to dto");
+		superheroDTO = superheroMapper.entityToDto(superheroEntity);	
+		log.debug("Returning the data");
 		return superheroDTO;
 	}
 	
