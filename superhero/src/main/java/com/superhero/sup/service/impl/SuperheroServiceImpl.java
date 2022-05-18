@@ -8,10 +8,12 @@ import javax.transaction.Transactional;
 
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.superhero.sup.dto.SuperheroDTO;
 import com.superhero.sup.entity.SuperheroEntity;
+import com.superhero.sup.exception.SuperheroException;
 import com.superhero.sup.mapper.SuperheroMapper;
 import com.superhero.sup.repository.SuperheroRepository;
 import com.superhero.sup.service.SuperheroService;
@@ -42,14 +44,19 @@ public class SuperheroServiceImpl implements SuperheroService{
 	}
 	
 	@Override
-	public SuperheroDTO getSuperhero(Long id){
+	public SuperheroDTO getSuperhero(Long id) {
 		log.debug("Getting the data from repository");
-		Optional<SuperheroEntity> superheroesEntity = repository.findById(id);
-		log.debug("Data obtained");
-		SuperheroDTO superheroDTO;	
-		log.debug("Mapping superhero to dto");
-		superheroDTO = superheroMapper.entityToDto(superheroesEntity.get());	
-		log.debug("Returning the data");
+		Optional<SuperheroEntity> superheroesEntity;
+		SuperheroDTO superheroDTO;
+		try {
+			superheroesEntity = repository.findById(id);
+			log.debug("Data obtained");	
+			log.debug("Mapping superhero to dto");
+			superheroDTO = superheroMapper.entityToDto(superheroesEntity.get());	
+			log.debug("Returning the data");
+		} catch (Exception e) {
+			throw new SuperheroException("Error getting superheroe", e);
+		}
 		return superheroDTO;
 	}
 	
@@ -84,7 +91,11 @@ public class SuperheroServiceImpl implements SuperheroService{
 	@Transactional
 	public void deleteSuperhero(Long id){
 		log.debug("Deleting the superhero");
-		repository.deleteById(id);
+		try {
+			repository.deleteById(id);
+		} catch (EmptyResultDataAccessException e) {
+			throw new SuperheroException("Error deleting superhero", e);
+		}
 		log.debug("Superhero deleted");
 	}
 }

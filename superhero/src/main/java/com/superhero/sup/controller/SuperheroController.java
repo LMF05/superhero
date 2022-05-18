@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.superhero.sup.dto.SuperheroDTO;
 import com.superhero.sup.entity.SuperheroEntity;
+import com.superhero.sup.exception.SuperheroException;
 import com.superhero.sup.service.SuperheroService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,42 +27,51 @@ public class SuperheroController {
 	private SuperheroService service;
 	
 	@GetMapping("/getAllSuperheroes")
-	public List<SuperheroDTO> getAllSuperheroes(){
+	public ResponseEntity<Object> getAllSuperheroes() throws SuperheroException{
 		log.debug("Getting all superheroes");
 		List<SuperheroDTO> superheroes = service.getAllSuperheroes();
 		log.debug("Returning the data");
-		return superheroes;
+		return new ResponseEntity<Object>(superheroes, HttpStatus.OK);
 	}
 	
 	@GetMapping("/getSuperhero")
-	public SuperheroDTO getSuperhero(@RequestParam Long id){
-		log.debug("Getting superhero");
-		SuperheroDTO superhero = service.getSuperhero(id);
-		log.debug("Returning the data");
-		return superhero;
+	public ResponseEntity<Object> getSuperhero(@RequestParam Long id){
+		SuperheroDTO superhero;
+		try {
+			log.debug("Getting superhero");
+			superhero = service.getSuperhero(id);
+			log.debug("Returning the data");
+		} catch (SuperheroException e) {
+			return new ResponseEntity<Object>(e.getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<Object>(superhero, HttpStatus.OK);
 	}
 	
 	@GetMapping("/getSuperheroByParameter")
-	public List<SuperheroDTO> getSuperheroByParameter(@RequestParam String substring){
+	public ResponseEntity<Object> getSuperheroByParameter(@RequestParam String substring){
 		log.debug("Getting superhero");
 		List<SuperheroDTO> superheroes = service.getSuperheroContainingSubstring(substring);
 		log.debug("Returning the data");
-		return superheroes;
+		return new ResponseEntity<Object>(superheroes, HttpStatus.OK);
 	}
 	
 	@PutMapping("/modifySuperhero")
-	public SuperheroDTO modifySuperhero(@RequestBody SuperheroEntity superhero){
+	public ResponseEntity<Object> modifySuperhero(@RequestBody SuperheroEntity superhero){
 		log.debug("Modifying superhero");
 		SuperheroDTO superheroDTO = service.modifySuperhero(superhero);
 		log.debug("Returning the data");
-		return superheroDTO;
+		return new ResponseEntity<Object>(superheroDTO, HttpStatus.OK);
 	}
 	
 	@PostMapping("/deleteSuperhero")
 	public ResponseEntity<String> deleteSuperhero(@RequestParam Long id) {
-		log.debug("Deleting superhero");
-		service.deleteSuperhero(id);
-		log.debug("Returning the data");
+		try {
+			log.debug("Deleting superhero");
+			service.deleteSuperhero(id);
+			log.debug("Returning the data");
+		} catch (SuperheroException e) {
+			return new ResponseEntity<String>(e.getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 		return new ResponseEntity<String>("Superhero deleted!", HttpStatus.OK);
 	}
 }

@@ -1,6 +1,6 @@
 package com.superhero.sup.exception;
 
-public class SuperheroException extends Exception {
+public class SuperheroException extends RuntimeException {
 
 	/**
 	 * 
