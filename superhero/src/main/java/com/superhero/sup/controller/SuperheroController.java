@@ -25,7 +25,7 @@ public class SuperheroController {
 	@Autowired
 	private SuperheroService service;
 	
-	@GetMapping("/superhero/getAllSuperheroes")
+	@GetMapping("/getAllSuperheroes")
 	public List<SuperheroDTO> getAllSuperheroes(){
 		log.debug("Getting all superheroes");
 		List<SuperheroDTO> superheroes = service.getAllSuperheroes();
@@ -33,7 +33,7 @@ public class SuperheroController {
 		return superheroes;
 	}
 	
-	@GetMapping("/superhero/getSuperhero")
+	@GetMapping("/getSuperhero")
 	public SuperheroDTO getSuperhero(@RequestParam Long id){
 		log.debug("Getting superhero");
 		SuperheroDTO superhero = service.getSuperhero(id);
@@ -41,7 +41,7 @@ public class SuperheroController {
 		return superhero;
 	}
 	
-	@GetMapping("/superhero")
+	@GetMapping("/getSuperheroByParameter")
 	public List<SuperheroDTO> getSuperheroByParameter(@RequestParam String substring){
 		log.debug("Getting superhero");
 		List<SuperheroDTO> superheroes = service.getSuperheroContainingSubstring(substring);
@@ -49,7 +49,7 @@ public class SuperheroController {
 		return superheroes;
 	}
 	
-	@PutMapping("/superhero/modifySuperhero")
+	@PutMapping("/modifySuperhero")
 	public SuperheroDTO modifySuperhero(@RequestBody SuperheroEntity superhero){
 		log.debug("Modifying superhero");
 		SuperheroDTO superheroDTO = service.modifySuperhero(superhero);
@@ -57,7 +57,7 @@ public class SuperheroController {
 		return superheroDTO;
 	}
 	
-	@PostMapping("/superhero/deleteSuperhero")
+	@PostMapping("/deleteSuperhero")
 	public ResponseEntity<String> deleteSuperhero(@RequestParam Long id) {
 		log.debug("Deleting superhero");
 		service.deleteSuperhero(id);
